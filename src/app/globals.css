@@ -56,6 +56,8 @@ html {
   background: var(--color-ink);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto;
+  /* Native anchor jumps clear the sticky header */
+  scroll-padding-top: 4rem;
 }
 
 body {

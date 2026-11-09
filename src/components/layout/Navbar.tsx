@@ -12,20 +12,12 @@ export default function Navbar() {
   const isHome = pathname === "/";
   const { scrollTo, lock, unlock } = useSmoothScroll();
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState("");
   const [open, setOpen] = useState(false);
 
-  // Background + hide-on-scroll-down
+  // Sticky header: always visible; gains a solid background and compacts once scrolled.
   useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 40);
-      setHidden(y > 400 && y > last + 4);
-      if (y < last - 4) setHidden(false);
-      last = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -73,8 +65,10 @@ export default function Navbar() {
     e.preventDefault();
     history.replaceState(null, "", href === "#top" ? "/" : href);
     // If the menu was open, wait until its scroll lock is released.
-    if (wasOpen) requestAnimationFrame(() => requestAnimationFrame(() => scrollTo(href)));
-    else scrollTo(href);
+    // Hero (#top) goes to 0; sections land just below the sticky header.
+    const run = () => (href === "#top" ? scrollTo(0) : scrollTo(href, { offset: -56 }));
+    if (wasOpen) requestAnimationFrame(() => requestAnimationFrame(run));
+    else run();
   };
 
   const homeHref = (hash: string) => (isHome ? hash : `/${hash}`);
@@ -82,11 +76,16 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-[120] transition-[transform,background-color,border-color] duration-700 ease-[var(--ease-out-expo)] ${
-          hidden && !open ? "-translate-y-full" : "translate-y-0"
-        } ${scrolled && !open ? "border-b border-line bg-ink/92" : "border-b border-transparent bg-transparent"}`}
+        className={`fixed inset-x-0 top-0 z-[120] border-b transition-[background-color,border-color] duration-700 ease-[var(--ease-out-expo)] ${
+          scrolled && !open ? "border-line bg-ink/95" : "border-transparent bg-transparent"
+        }`}
       >
-        <nav className="flex h-16 items-center justify-between px-gutter md:h-20" aria-label="Primary">
+        <nav
+          className={`flex items-center justify-between px-gutter transition-[height] duration-700 ease-[var(--ease-out-expo)] ${
+            scrolled && !open ? "h-14 md:h-16" : "h-16 md:h-20"
+          }`}
+          aria-label="Primary"
+        >
           <Link
             href={isHome ? "#top" : "/"}
             onClick={(e) => isHome && go(e, "#top")}
