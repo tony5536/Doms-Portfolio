@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { useState } from "react";
 import { siteConfig } from "@/data/siteConfig";
 import SectionHeader from "@/components/ui/SectionHeader";
 
-/** Interactive typographic list. Hovering a service reveals a framed preview that trails the pointer. */
+/** Disciplines as a typographic list; a still trails the pointer on hover (desktop). */
 export default function Services() {
   const [active, setActive] = useState<number | null>(null);
   const x = useMotionValue(0);
@@ -17,7 +17,14 @@ export default function Services() {
 
   return (
     <section id="services" className="section-y relative bg-ink-2" aria-labelledby="services-title">
-      <SectionHeader id="services-title" index="05" label="Services" title="What I Do" intro="From the first frame to the final grade." />
+      <SectionHeader
+        id="services-title"
+        index="05"
+        label="Services"
+        aside={`${String(services.length).padStart(2, "0")} disciplines`}
+        title="What I Do"
+        intro="From the first frame to the final grade."
+      />
 
       <ul
         className="relative px-gutter"
@@ -32,39 +39,23 @@ export default function Services() {
           <li
             key={s.title}
             onPointerEnter={(e) => e.pointerType === "mouse" && setActive(i)}
-            className="group relative border-t border-line last:border-b"
+            className="border-b border-line first:border-t"
           >
             <div
-              className={`grid grid-cols-12 items-center gap-4 py-6 transition-opacity duration-500 md:py-8 ${
-                active !== null && active !== i ? "md:opacity-25" : ""
+              className={`grid grid-cols-12 items-baseline gap-4 py-5 transition-opacity duration-500 md:py-7 ${
+                active !== null && active !== i ? "md:opacity-30" : ""
               }`}
             >
-              <span className="col-span-2 font-mono text-xs text-ash md:col-span-1">{String(i + 1).padStart(2, "0")}</span>
-              <h3 className="col-span-10 md:col-span-10">
-                <span className="relative block overflow-hidden text-h3 leading-[1.05]">
-                  <span
-                    className={`block font-medium uppercase tracking-[-0.04em] transition-transform duration-700 ease-[var(--ease-out-expo)] ${
-                      active === i ? "md:-translate-y-full" : ""
-                    }`}
-                  >
-                    {s.title}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    className={`serif-italic absolute inset-0 block text-champagne transition-transform duration-700 ease-[var(--ease-out-expo)] ${
-                      active === i ? "translate-y-0" : "translate-y-full"
-                    }`}
-                  >
-                    {s.title}
-                  </span>
+              <span className="meta col-span-2 md:col-span-1">{String(i + 1).padStart(2, "0")}</span>
+              <h3 className="col-span-10 md:col-span-11">
+                <span
+                  className={`display inline-block text-h3 transition-transform duration-700 ease-[var(--ease-out-expo)] ${
+                    active === i ? "md:translate-x-4" : ""
+                  }`}
+                >
+                  {s.title}
                 </span>
               </h3>
-              <span
-                className={`col-span-1 hidden justify-self-end text-2xl text-ash transition-transform duration-700 md:block ${active === i ? "rotate-45 text-bone" : ""}`}
-                aria-hidden="true"
-              >
-                +
-              </span>
             </div>
           </li>
         ))}
@@ -74,12 +65,12 @@ export default function Services() {
         <AnimatePresence>
           {active !== null && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotate: -4 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.85 }}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="relative -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-              style={{ width: 300, height: 380 }}
+              className="relative -translate-y-1/2 translate-x-10 overflow-hidden"
+              style={{ width: 280, height: 350 }}
             >
               {services.map((s, i) => (
                 <Image
@@ -87,7 +78,7 @@ export default function Services() {
                   src={s.image}
                   alt=""
                   fill
-                  sizes="300px"
+                  sizes="280px"
                   className={`object-cover transition-[opacity,transform] duration-700 ${active === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`}
                 />
               ))}

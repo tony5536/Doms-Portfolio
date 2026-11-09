@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, IBM_Plex_Mono, Inter_Tight } from "next/font/google";
+import { Archivo, Newsreader } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/data/siteConfig";
 import SmoothScroll from "@/components/animations/SmoothScroll";
@@ -8,24 +8,20 @@ import Navbar from "@/components/layout/Navbar";
 import Preloader, { introScript } from "@/components/layout/Preloader";
 import JsonLd from "@/components/layout/JsonLd";
 
-const interTight = Inter_Tight({
+/** One variable grotesk: wide (wdth 125) for titles, normal for text. */
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-inter-tight",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
-const cormorant = Cormorant_Garamond({
+/** Editorial serif, italic only — used sparingly for spoken statements. */
+const newsreader = Newsreader({
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-plex-mono",
+  style: ["italic"],
+  axes: ["opsz"],
+  variable: "--font-newsreader",
   display: "swap",
 });
 
@@ -67,7 +63,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${interTight.variable} ${cormorant.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${archivo.variable} ${newsreader.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
       </head>
@@ -75,7 +71,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <JsonLd />
         <a
           href="#main"
-          className="eyebrow fixed left-4 top-4 z-[200] -translate-y-24 bg-bone px-4 py-3 !text-ink focus:translate-y-0"
+          className="meta fixed left-4 top-4 z-[200] -translate-y-24 bg-bone px-4 py-3 !text-ink focus:translate-y-0"
         >
           Skip to content
         </a>

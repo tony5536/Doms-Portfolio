@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -98,7 +98,7 @@ export default function Lightbox({ images, index, onClose, onIndexChange }: Prop
         >
           {/* top bar */}
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-gutter py-5">
-            <span className="eyebrow tabular-nums !text-bone">
+            <span className="meta tabular-nums !text-bone">
               {String(index! + 1).padStart(2, "0")} <span className="text-ash">/ {String(count).padStart(2, "0")}</span>
             </span>
             <button
@@ -143,7 +143,7 @@ export default function Lightbox({ images, index, onClose, onIndexChange }: Prop
 
           {/* caption + controls */}
           <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-gutter py-5">
-            <p className="eyebrow truncate pr-4">{img.caption ?? img.alt}</p>
+            <p className="meta truncate pr-4">{img.caption ?? img.alt}</p>
             <div className="flex gap-2">
               <button type="button" onClick={() => go(-1)} aria-label="Previous image" className="flex h-11 w-11 items-center justify-center rounded-full border border-line transition-colors hover:border-bone">
                 <ChevronLeft className="h-4 w-4" strokeWidth={1.25} />

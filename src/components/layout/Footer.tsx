@@ -5,26 +5,31 @@ import BackToTop from "@/components/ui/BackToTop";
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-line bg-ink px-gutter pb-8 pt-10">
-      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div className="space-y-2">
-          <Link href="/" className="text-[13px] font-medium uppercase tracking-[0.28em]">
-            {siteConfig.name}
-          </Link>
-          <p className="eyebrow">{siteConfig.role}</p>
-        </div>
-        <div className="flex items-center gap-8">
-          <p className="eyebrow">
-            {siteConfig.location.city}, {siteConfig.location.country}
-          </p>
+    <footer className="relative overflow-hidden border-t border-line bg-ink">
+      <div className="grid gap-8 px-gutter pt-12 md:grid-cols-12">
+        <p className="serif text-lead text-bone/80 md:col-span-5">{siteConfig.tagline}</p>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 md:col-span-4 md:col-start-7" aria-label="Footer">
+          {siteConfig.nav.map((n) => (
+            <Link key={n.id} href={`/${n.href}`} className="link-line text-sm text-bone/80 hover:text-bone">
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="md:col-span-2 md:col-start-11 md:justify-self-end">
           <BackToTop />
         </div>
       </div>
-      <div className="mt-10 flex flex-col gap-2 border-t border-line pt-6 sm:flex-row sm:justify-between">
-        <p className="eyebrow">
-          © <CurrentYear /> {siteConfig.name}. All rights reserved.
+
+      {/* Wordmark — sized to the page width */}
+      <p aria-hidden="true" className="display mt-14 select-none whitespace-nowrap px-gutter text-center text-[9.1vw] leading-[0.8] text-bone/95 [@media(min-width:1680px)]:text-[9.5rem]">
+        {siteConfig.name}
+      </p>
+
+      <div className="mt-6 flex flex-col gap-2 border-t border-line px-gutter py-6 sm:flex-row sm:justify-between">
+        <p className="meta">
+          © <CurrentYear /> {siteConfig.name} — {siteConfig.location.city}, {siteConfig.location.country}
         </p>
-        <p className="eyebrow">All frames are the property of their creator.</p>
+        {siteConfig.demoContent && <p className="meta">Demo imagery via Unsplash — portfolio in progress</p>}
       </div>
     </footer>
   );

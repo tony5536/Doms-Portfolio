@@ -1,226 +1,176 @@
 "use client";
 
-import Image from "next/image";
+import Image from "@/components/ui/Img";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { siteConfig } from "@/data/siteConfig";
 import { useIntroDone } from "@/lib/intro";
 import { useSmoothScroll } from "@/components/animations/SmoothScroll";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-function Timecode() {
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const start = performance.now();
-    let raf = 0;
-    let lastFrame = -1;
-    const p = (n: number) => String(n).padStart(2, "0");
-    const tick = (now: number) => {
-      const frames = Math.floor(((now - start) / 1000) * 24);
-      if (frames !== lastFrame && ref.current) {
-        lastFrame = frames;
-        const f = frames % 24;
-        const s = Math.floor(frames / 24);
-        ref.current.textContent = `${p(Math.floor(s / 3600))}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}:${p(f)}`;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-  return (
-    <span ref={ref} className="tabular-nums">
-      00:00:00:00
-    </span>
-  );
-}
-
-function LocalTime() {
-  const [time, setTime] = useState("");
-  useEffect(() => {
-    const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" });
-    const update = () => setTime(fmt.format(new Date()));
-    update();
-    const id = setInterval(update, 30_000);
-    return () => clearInterval(id);
-  }, []);
-  return <span className="tabular-nums">{time ? `${time} IST` : "IST"}</span>;
-}
-
+/**
+ * Opening title sequence, set like a film poster around Dominic's portrait.
+ * Desktop: the photo sits in a tall frame at native sharpness over a blurred,
+ * darkened copy of itself; the name runs across the lower third.
+ * Phones: the photo fills the screen.
+ * While pinned, letterbox bars close to 2.39:1 and the title dissolves.
+ */
 export default function Hero() {
   const section = useRef<HTMLElement>(null);
   const ready = useIntroDone();
   const reduce = useReducedMotion();
   const { scrollTo } = useSmoothScroll();
-  const [showVideo, setShowVideo] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const { media } = siteConfig;
+  const photo = media.heroPortrait;
 
-  // Only mount the background video on larger screens, with motion allowed.
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
-    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const update = () => setShowVideo(Boolean(media.heroVideo) && mq.matches && !conn?.saveData);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, [media.heroVideo]);
-
-  const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end start"] });
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.18]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const frameY = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
-  const veil = useTransform(scrollYProgress, [0, 1], [0, 0.85]);
+  const { scrollYProgress: p } = useScroll({ target: section, offset: ["start start", "end end"] });
+  const bar = useTransform(p, [0.05, 0.75], [0, 1], { clamp: true });
+  const barHeight = useTransform(bar, (v) => `calc(${v} * max(0px, (100svh - 100vw / 2.39) / 2))`);
+  const imgScale = useTransform(p, [0, 1], [1.04, 1]); // small range keeps the 635px photo sharp
+  const titleOpacity = useTransform(p, [0, 0.35], [1, 0]);
+  const titleY = useTransform(p, [0, 0.4], ["0%", "-18%"]);
+  const titleSpacing = useTransform(p, [0, 0.4], ["-0.035em", "0.06em"]);
+  const captionOpacity = useTransform(p, [0.6, 0.85], [0, 1]);
 
   const show = ready || reduce;
-  const letter = (i: number, base = 0) => ({
-    initial: reduce ? false : { y: "105%" },
-    animate: show ? { y: "0%" } : undefined,
-    transition: { duration: 1.4, delay: base + i * 0.05, ease },
-  });
+  const words = siteConfig.name.toUpperCase().split(" ");
+
   const fade = (delay: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 16 },
+    initial: reduce ? false : { opacity: 0, y: 14 },
     animate: show ? { opacity: 1, y: 0 } : undefined,
-    transition: { duration: 1.2, delay, ease },
+    transition: { duration: 1.4, delay, ease },
   });
 
   return (
-    <section id="top" ref={section} className="relative h-[100svh] min-h-[620px] overflow-hidden bg-ink" aria-label="Introduction">
-      {/* ── Background ── */}
-      <motion.div className="absolute inset-0" style={reduce ? undefined : { scale: bgScale }}>
-        {/* Mobile: the portrait is the opening frame */}
-        <Image
-          src={media.portrait.src}
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 768px) 1px, 100vw"
-          className="object-cover object-[50%_25%] md:hidden"
-        />
-        {/* Desktop: still (poster) → video when available */}
-        <div className="absolute inset-0 hidden md:block">
-          <Image src={media.heroPoster} alt="" fill sizes="100vw" className="animate-kenburns object-cover opacity-80" />
-          {showVideo && (
-            <video
-              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1500ms] ${videoReady ? "opacity-100" : "opacity-0"}`}
-              src={media.heroVideo}
-              poster={media.heroPoster}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden="true"
-              onCanPlay={() => setVideoReady(true)}
-              onError={() => setShowVideo(false)}
-            />
-          )}
-        </div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(8,8,8,0.85)_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/20 to-ink" />
-      </motion.div>
-      <motion.div className="pointer-events-none absolute inset-0 bg-ink" style={{ opacity: veil }} />
-
-      {/* ── Portrait frame (desktop) ── */}
-      <motion.figure
-        className="absolute right-[var(--edge)] top-[18%] hidden w-[min(26vw,400px)] md:block"
-        style={reduce ? undefined : { y: frameY }}
-        initial={reduce ? false : { clipPath: "inset(100% 0% 0% 0%)" }}
-        animate={show ? { clipPath: "inset(0% 0% 0% 0%)" } : undefined}
-        transition={{ duration: 1.6, delay: 0.35, ease: [0.76, 0, 0.24, 1] }}
-      >
-        <div className="relative aspect-[635/845] overflow-hidden bg-ink-2">
+    <section
+      id="top"
+      ref={section}
+      className={`relative bg-ink ${reduce ? "h-[100svh]" : "h-[185svh]"}`}
+      aria-label="Introduction"
+    >
+      <div className="sticky top-0 h-[100svh] min-h-[560px] overflow-hidden">
+        {/* ── Frame ── */}
+        <motion.div
+          className="absolute inset-0"
+          style={reduce ? undefined : { scale: imgScale }}
+          initial={reduce ? false : { opacity: 0 }}
+          animate={show ? { opacity: 1 } : undefined}
+          transition={{ duration: 2.2, ease }}
+        >
+          {/* Ambient backdrop (desktop): the same photo, blurred and pushed into shadow */}
           <Image
-            src={media.portrait.src}
-            alt={media.portrait.alt}
+            src={photo.src}
+            alt=""
+            fill
+            sizes="50vw"
+            className="hidden scale-125 object-cover blur-3xl brightness-[0.32] saturate-[0.7] md:block"
+          />
+          {/* Phones: full-bleed portrait */}
+          <Image
+            src={photo.src}
+            alt={photo.alt}
             fill
             priority
-            sizes="(min-width: 768px) 400px, 1px"
-            className="object-cover"
+            sizes="(min-width: 768px) 1px, 100vw"
+            className="object-cover object-[50%_20%] brightness-[0.82] contrast-[1.05] saturate-[0.85] md:hidden"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
-        </div>
-        <figcaption className="mt-3 flex justify-between">
-          <span className="eyebrow">Fig. 01</span>
-          <span className="eyebrow">{siteConfig.name}</span>
-        </figcaption>
-      </motion.figure>
-
-      {/* ── Viewfinder UI ── */}
-      <motion.div className="pointer-events-none absolute inset-0" {...fade(0.9)}>
-        <div className="absolute inset-x-[var(--edge)] top-20 flex justify-between md:top-28">
-          <span className="eyebrow flex items-center gap-2 !text-bone/80">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#c4523f] animate-blink" />
-            Rec <span className="hidden sm:inline">·</span> <span className="hidden sm:inline"><Timecode /></span>
-          </span>
-          <span className="eyebrow text-right !text-bone/80">
-            {siteConfig.location.city}, {siteConfig.location.country}
-            <span className="hidden sm:inline"> · <LocalTime /></span>
-          </span>
-        </div>
-        {/* corner marks */}
-        <div className="absolute inset-[calc(var(--gutter)*0.6)] hidden md:block">
-          {["left-0 top-14 border-l border-t", "right-0 top-14 border-r border-t", "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r"].map((c) => (
-            <span key={c} className={`absolute h-6 w-6 border-bone/40 ${c}`} />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* ── Title ── */}
-      <motion.div
-        className="absolute inset-x-0 bottom-0 px-gutter pb-24 md:pb-16"
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-      >
-        <motion.p className="eyebrow mb-6 !text-champagne md:mb-8" {...fade(0.5)}>
-          {siteConfig.titles.join(" / ")}
-        </motion.p>
-
-        <h1 className="relative" aria-label={siteConfig.name}>
-          <span aria-hidden="true" className="display block overflow-hidden text-hero">
-            {siteConfig.firstName.toUpperCase().split("").map((ch, i) => (
-              <motion.span key={i} className="inline-block will-change-transform" {...letter(i)}>
-                {ch}
-              </motion.span>
-            ))}
-          </span>
-          <span aria-hidden="true" className="-mt-[0.06em] block overflow-hidden pb-[0.12em] md:ml-[12vw]">
-            <motion.span
-              className="serif-italic inline-block text-hero text-bone/95"
-              {...letter(0, 0.3)}
-            >
-              {siteConfig.lastName}
-            </motion.span>
-          </span>
-        </h1>
-
-        <div className="mt-6 flex items-end justify-between gap-8 md:mt-10">
-          <motion.p className="serif-italic max-w-[22ch] text-quote text-bone/85" {...fade(0.9)}>
-            &ldquo;{siteConfig.tagline}&rdquo;
-          </motion.p>
-
-          <motion.button
-            type="button"
-            onClick={() => scrollTo("#work")}
-            className="group pointer-events-auto hidden shrink-0 flex-col items-center gap-3 sm:flex"
-            aria-label="Scroll to selected work"
-            {...fade(1.1)}
+          {/* Desktop: the portrait in a tall frame, shown at native sharpness */}
+          <div
+            className="absolute left-1/2 top-[11svh] hidden h-[78svh] max-h-[845px] -translate-x-1/2 overflow-hidden md:block"
+            style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
           >
-            <span className="eyebrow [writing-mode:vertical-rl]">Scroll</span>
-            <span className="relative block h-16 w-px overflow-hidden bg-line">
-              <span className="absolute inset-x-0 top-0 h-1/3 bg-bone animate-scroll-cue" />
-            </span>
-          </motion.button>
-        </div>
-      </motion.div>
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              priority
+              sizes="(min-width: 768px) 640px, 1px"
+              className="object-cover brightness-[0.85] contrast-[1.05] saturate-[0.85]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent from-50% to-ink/90" />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-ink/50 via-transparent via-40% to-ink" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(8,8,8,0.7)_100%)]" />
+        </motion.div>
 
-      {/* mobile scroll cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 sm:hidden" aria-hidden="true">
-        <span className="relative block h-10 w-px overflow-hidden bg-line">
-          <span className="absolute inset-x-0 top-0 h-1/3 bg-bone animate-scroll-cue" />
-        </span>
+        {/* ── Letterbox ── */}
+        {!reduce && (
+          <>
+            <motion.div className="absolute inset-x-0 top-0 z-10 bg-ink" style={{ height: barHeight }} />
+            <motion.div className="absolute inset-x-0 bottom-0 z-10 bg-ink" style={{ height: barHeight }}>
+              <motion.div className="flex h-full items-center justify-between px-gutter" style={{ opacity: captionOpacity }}>
+                <span className="meta">{siteConfig.name} — {siteConfig.location.city}</span>
+                <span className="meta hidden sm:inline">2.39 : 1</span>
+              </motion.div>
+            </motion.div>
+          </>
+        )}
+
+        {/* ── Title card ── */}
+        <motion.div
+          className="absolute inset-0 z-20 flex flex-col px-gutter pb-8 pt-24 md:pb-10 md:pt-28"
+          style={reduce ? undefined : { opacity: titleOpacity }}
+        >
+          <motion.div className="flex items-start justify-between gap-6" {...fade(0.6)}>
+            <p className="meta !text-bone/80">
+              {siteConfig.titles.map((t, i) => (
+                <span key={t} className="block sm:inline">
+                  {t}
+                  {i < siteConfig.titles.length - 1 && <span className="hidden px-2 text-ash sm:inline">/</span>}
+                </span>
+              ))}
+            </p>
+            <p className="meta text-right !text-bone/80">
+              {siteConfig.location.city}, {siteConfig.location.country}
+            </p>
+          </motion.div>
+
+          <motion.div className="flex flex-1 flex-col items-center justify-end pb-[5svh] text-center" style={reduce ? undefined : { y: titleY }}>
+            <h1 aria-label={siteConfig.name}>
+              <motion.span
+                aria-hidden="true"
+                className="display flex flex-col items-center text-[13.5vw] leading-[0.92] sm:flex-row sm:gap-[0.32em] sm:text-hero"
+                style={reduce ? undefined : { letterSpacing: titleSpacing }}
+              >
+                {words.map((word, w) => (
+                  <span key={word} className="block overflow-hidden pb-[0.04em]">
+                    {word.split("").map((ch, i) => (
+                      <motion.span
+                        key={i}
+                        className="inline-block will-change-transform"
+                        initial={reduce ? false : { y: "105%" }}
+                        animate={show ? { y: "0%" } : undefined}
+                        transition={{ duration: 1.5, delay: 0.15 + w * 0.2 + i * 0.045, ease }}
+                      >
+                        {ch}
+                      </motion.span>
+                    ))}
+                  </span>
+                ))}
+              </motion.span>
+            </h1>
+            <motion.p className="serif mt-6 text-quote text-bone/90 md:mt-8" {...fade(1.1)}>
+              {siteConfig.tagline}
+            </motion.p>
+          </motion.div>
+
+          <motion.div className="flex items-end justify-between" {...fade(1.3)}>
+            <button type="button" onClick={() => scrollTo("#work", { offset: -56 })} className="group flex items-center gap-3" aria-label="Scroll to selected work">
+              <span className="relative block h-10 w-px overflow-hidden bg-line">
+                <span className="absolute inset-x-0 top-0 h-1/3 bg-bone animate-scroll-cue" />
+              </span>
+              <span className="meta !text-bone/80 transition-colors group-hover:!text-bone">Scroll</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollTo("#showreel", { offset: -56 })}
+              className="meta link-line pb-1 !text-bone"
+            >
+              Watch the reel
+            </button>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

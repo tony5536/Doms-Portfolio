@@ -67,7 +67,7 @@ export default function VideoModal({ open, onClose, src, title }: Props) {
           data-lenis-prevent
         >
           <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-gutter py-5 md:py-7">
-            <span className="eyebrow !text-bone/80">{title}</span>
+            <span className="meta !text-bone/80">{title}</span>
             <button
               ref={closeBtn}
               type="button"
@@ -91,8 +91,8 @@ export default function VideoModal({ open, onClose, src, title }: Props) {
           >
             {failed || !src ? (
               <div className="flex h-full flex-col items-center justify-center gap-4 border border-line px-6 text-center">
-                <p className="serif-italic text-3xl md:text-5xl">Coming soon.</p>
-                <p className="eyebrow max-w-md">
+                <p className="serif text-3xl md:text-5xl">Coming soon.</p>
+                <p className="meta max-w-md">
                   Video not available yet — add the file at <span className="text-bone">{src || "the configured path"}</span> or set an embed URL in siteConfig.
                 </p>
               </div>

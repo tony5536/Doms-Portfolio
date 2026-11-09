@@ -3,52 +3,50 @@
 /* ───────────────────────── Design tokens ───────────────────────── */
 @theme {
   --color-ink: #080808;
-  --color-ink-2: #111111;
-  --color-ink-3: #1a1a1a;
+  --color-ink-2: #101010;
+  --color-ink-3: #181818;
   --color-bone: #f5f3ef;
   --color-ash: #929292;
   --color-smoke: #5c5c5c;
-  --color-champagne: #c8b89a;
+  --color-champagne: #cbb994;
   --color-silver: #bdb7ad;
-  --color-line: rgb(245 243 239 / 0.12);
+  --color-line: rgb(245 243 239 / 0.14);
 
-  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  /* Archivo carries the system (wide for titles, normal for text);
+     Newsreader italic is reserved for a few spoken statements. */
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
 
   --ease-cinema: cubic-bezier(0.76, 0, 0.24, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-  --breakpoint-3xl: 112rem;
-
   /* Type scale — every section uses these, nothing ad hoc */
-  --text-hero: clamp(4.2rem, 17vw, 17rem);
-  --text-hero--line-height: 0.84;
-  --text-h2: clamp(3rem, 9vw, 9.5rem);
-  --text-h2--line-height: 0.86;
-  --text-h3: clamp(2rem, 4.2vw, 4.5rem);
-  --text-h3--line-height: 0.95;
-  --text-statement: clamp(2.2rem, 4.6vw, 4.75rem);
+  --text-hero: clamp(2.5rem, 8.6vw, 9.75rem);
+  --text-hero--line-height: 0.92;
+  --text-h2: clamp(2.5rem, 7vw, 7.5rem);
+  --text-h2--line-height: 0.92;
+  --text-h3: clamp(1.6rem, 2.9vw, 3rem);
+  --text-h3--line-height: 1;
+  --text-statement: clamp(2.4rem, 5.4vw, 5.75rem);
   --text-statement--line-height: 1.02;
-  --text-quote: clamp(1.6rem, 3vw, 2.6rem);
-  --text-quote--line-height: 1.15;
-  --text-lead: clamp(1.25rem, 1.9vw, 1.75rem);
-  --text-lead--line-height: 1.3;
-  --text-body: clamp(1rem, 1.1vw, 1.125rem);
+  --text-quote: clamp(1.6rem, 2.8vw, 2.6rem);
+  --text-quote--line-height: 1.18;
+  --text-lead: clamp(1.15rem, 1.6vw, 1.5rem);
+  --text-lead--line-height: 1.4;
+  --text-body: clamp(1rem, 1.05vw, 1.0625rem);
   --text-body--line-height: 1.7;
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1.4;
 }
 
 /* ───────────────────────── Base ───────────────────────── */
 :root {
   color-scheme: dark;
-  /* Horizontal: gutter between columns, and the page edge that keeps
-     content inside one max width on large screens. */
-  --gutter: clamp(1.25rem, 4vw, 3.5rem);
-  --max-w: 1600px;
+  --gutter: clamp(1.25rem, 3.6vw, 3.25rem);
+  --max-w: 1680px;
   --edge: max(var(--gutter), calc((100vw - var(--max-w)) / 2));
-  /* Vertical rhythm shared by every section */
   --section-y: clamp(6rem, 11vw, 11rem);
-  --header-gap: clamp(3.5rem, 7vw, 6.5rem);
+  --header-gap: clamp(3rem, 6vw, 5.5rem);
   --block-gap: clamp(4rem, 9vw, 9rem);
 }
 
@@ -56,7 +54,6 @@ html {
   background: var(--color-ink);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: auto;
-  /* Native anchor jumps clear the sticky header */
   scroll-padding-top: 4rem;
 }
 
@@ -64,7 +61,7 @@ body {
   background: var(--color-ink);
   color: var(--color-bone);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
+  font-variation-settings: "wdth" 100;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
@@ -72,7 +69,7 @@ body {
 }
 
 ::selection {
-  background: var(--color-champagne);
+  background: var(--color-bone);
   color: var(--color-ink);
 }
 
@@ -106,7 +103,6 @@ html.intro-seen #dx-preloader {
   display: none;
 }
 
-/* Custom cursor — only hides the native cursor when the custom one is active */
 @media (pointer: fine) {
   html.has-cursor,
   html.has-cursor * {
@@ -115,61 +111,72 @@ html.intro-seen #dx-preloader {
 }
 
 /* ───────────────────────── Utilities ───────────────────────── */
-/* Page edge: gutter on small screens, centred max-width on large ones */
 @utility px-gutter {
   padding-inline: var(--edge);
 }
-
 @utility section-y {
   padding-block: var(--section-y);
 }
-
 @utility mb-header {
   margin-bottom: var(--header-gap);
 }
-
 @utility mt-header {
   margin-top: var(--header-gap);
 }
-
 @utility mt-block {
   margin-top: var(--block-gap);
 }
 
-@utility eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  line-height: 1.4;
-  letter-spacing: 0.22em;
+/* Wide title-card grotesk */
+@utility display {
+  font-family: var(--font-sans);
+  font-variation-settings: "wdth" 125;
+  font-weight: 400;
   text-transform: uppercase;
+  letter-spacing: -0.035em;
+}
+
+/* Wide, light — for credits and the name */
+@utility credit {
+  font-family: var(--font-sans);
+  font-variation-settings: "wdth" 125;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Small labels: normal-width grotesk, tracked, tabular figures */
+@utility meta {
+  font-family: var(--font-sans);
+  font-variation-settings: "wdth" 100;
+  font-size: var(--text-meta);
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
   color: var(--color-ash);
 }
 
-@utility display {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: -0.045em;
-  line-height: 0.84;
-}
-
-@utility serif-italic {
+/* Spoken statements */
+@utility serif {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 300;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+  font-optical-sizing: auto;
 }
 
 @utility hairline {
   border-color: var(--color-line);
 }
 
-@utility link-underline {
+@utility link-line {
   background-image: linear-gradient(currentColor, currentColor);
   background-size: 0% 1px;
   background-position: 100% 100%;
   background-repeat: no-repeat;
-  transition: background-size 0.6s var(--ease-out-expo);
+  transition: background-size 0.7s var(--ease-out-expo);
   &:hover,
   &:focus-visible {
     background-size: 100% 1px;
@@ -183,7 +190,7 @@ html.intro-seen #dx-preloader {
   inset: -50%;
   z-index: 90;
   pointer-events: none;
-  opacity: 0.06;
+  opacity: 0.045;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   animation: grain 0.9s steps(6) infinite;
   will-change: transform;
@@ -199,12 +206,8 @@ html.intro-seen #dx-preloader {
 }
 
 @keyframes kenburns {
-  from { transform: scale(1.04) translate3d(0, 0, 0); }
-  to { transform: scale(1.14) translate3d(-1.5%, -1%, 0); }
-}
-
-@keyframes spin-slow {
-  to { transform: rotate(360deg); }
+  from { transform: scale(1.02); }
+  to { transform: scale(1.1); }
 }
 
 @keyframes scroll-cue {
@@ -212,15 +215,8 @@ html.intro-seen #dx-preloader {
   60%, 100% { transform: translateY(220%); }
 }
 
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0.15; }
-}
-
-.animate-kenburns { animation: kenburns 24s ease-in-out infinite alternate; }
-.animate-spin-slow { animation: spin-slow 18s linear infinite; }
+.animate-kenburns { animation: kenburns 26s ease-in-out infinite alternate; }
 .animate-scroll-cue { animation: scroll-cue 2.4s var(--ease-cinema) infinite; }
-.animate-blink { animation: blink 1.6s steps(1) infinite; }
 
 /* ───────────────────────── Reduced motion ───────────────────────── */
 @media (prefers-reduced-motion: reduce) {

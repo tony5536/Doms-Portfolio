@@ -9,6 +9,7 @@ export default function Photography() {
         id="photography-title"
         index="03"
         label="Photography"
+        aside="Portraits — Fashion — Editorial"
         title="Still Frames"
         intro="Portraits, fashion, editorial and the moments in between."
       />

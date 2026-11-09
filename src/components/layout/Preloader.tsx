@@ -62,27 +62,29 @@ export default function Preloader() {
         {visible && (
           <motion.div id="dx-preloader" className="fixed inset-0 z-[250]" aria-hidden="true" exit={{ pointerEvents: "none" }}>
             <motion.div
-              className="absolute inset-x-0 top-0 h-1/2 bg-ink"
+              className="absolute inset-x-0 top-0 h-[calc(50%+1px)] bg-ink"
               exit={{ y: "-100%" }}
               transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
             />
             <motion.div
-              className="absolute inset-x-0 bottom-0 h-1/2 bg-ink"
+              className="absolute inset-x-0 bottom-0 h-[calc(50%+1px)] bg-ink"
               exit={{ y: "100%" }}
               transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
             />
             <motion.div
-              className="absolute inset-0 flex flex-col items-center justify-center px-gutter"
+              className="absolute inset-0 flex flex-col items-center justify-center px-gutter text-center"
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="relative h-px w-[min(60vw,420px)] bg-line">
-                <div className="absolute inset-y-0 left-0 bg-champagne" style={{ width: `${count}%` }} />
-              </div>
-              <div className="mt-6 flex w-[min(60vw,420px)] justify-between">
-                <span className="eyebrow">{siteConfig.name}</span>
-                <span className="eyebrow tabular-nums text-bone">{String(count).padStart(3, "0")}</span>
-              </div>
+              <motion.p
+                className="credit text-[clamp(1rem,2.4vw,1.75rem)]"
+                initial={{ opacity: 0, letterSpacing: "0.5em" }}
+                animate={{ opacity: 1, letterSpacing: "0.08em" }}
+                transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {siteConfig.name}
+              </motion.p>
+              <p className="meta mt-5 tabular-nums">{String(count).padStart(3, "0")}</p>
             </motion.div>
           </motion.div>
         )}

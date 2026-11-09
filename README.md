@@ -23,32 +23,44 @@ if set (Formspree, Getform, your API route…), otherwise opens a pre-filled ema
 Set the real domain via `NEXT_PUBLIC_SITE_URL` (or `siteConfig.url`) — it drives canonical URLs,
 `sitemap.xml`, `robots.txt` and Open Graph links.
 
-## ⚠ Placeholder assets — replace before launch
+## ⚠ Demo content — replace before launch
 
-| Asset | Status |
+The site currently uses **free Unsplash photographs as demo imagery** (not Dominic's work), loaded
+straight from Unsplash's CDN at the size each screen needs. While `siteConfig.demoContent` is `true`,
+the footer and project pages carry a small "Demo imagery via Unsplash" note.
+
+| Content | Status |
 | --- | --- |
-| `public/images/portraits/dominic-xavier.png` | **Real** — supplied photo of Dominic (635×845; a higher-res original would sharpen the About section and desktop hero) |
-| `public/images/projects/**` | PLACEHOLDER — generated abstract frames, visibly labelled |
-| `public/images/gallery/**` | PLACEHOLDER — generated abstract frames, visibly labelled |
-| `public/images/hero/*.jpg` | PLACEHOLDER — hero still, showreel cover, contact background |
-| `public/videos/hero.mp4` | **Missing** — hero falls back to the still (desktop) / portrait (mobile) |
+| `public/images/portraits/dominic-xavier.png` | **Real** — supplied photo of Dominic (635×845; a higher-res original would sharpen the About section) |
+| Projects in `projects.ts` | DEMO — titles, years, copy and Unsplash images are stand-ins (`demo: true`) |
+| Gallery in `gallery.ts` | DEMO — Unsplash images (`demo: true`) |
+| Hero still, showreel cover, contact background (`siteConfig.media`) | DEMO — Unsplash |
+| Service hover previews (`siteConfig.services`) | DEMO — reuse project imagery |
+| Hero (`siteConfig.media.heroPortrait`) | **Real** — Dominic's portrait, set like a film poster. Swap in a higher-res portrait for extra sharpness |
 | `public/videos/showreel.mp4` | **Missing** — modal shows "Coming soon" until a file or embed URL is set |
-| Projects in `projects.ts` | SAMPLE ENTRIES (`placeholder: true`) — shown with a "Sample entry" tag |
 | `about.philosophy` | Temporary copy — replace with Dominic's own words |
 
-To replace an image, drop the real file at the same path (or change the path) and update `width`/`height`
-to the real pixel size (prevents layout shift). Set `placeholder: false` to remove the tag.
+To swap in real work: put files in `public/images/...` and use local paths (e.g. `"/images/projects/altitude/cover.jpg"`)
+with the real pixel `width`/`height`, or any `https://images.unsplash.com/...` URL. Then set `demo: false` on each
+entry and `demoContent: false` in `siteConfig.ts`.
 
-Regenerate placeholders / social image:
+Regenerate the social image (from the portrait):
 
 ```bash
-node scripts/generate-placeholders.mjs   # abstract placeholder frames
-node scripts/generate-social.mjs         # public/og-image.jpg (1200×630) + apple icon, from the portrait
+node scripts/generate-social.mjs         # public/og-image.jpg (1200×630) + apple icon
 ```
 
+## Typography
+
+- **Archivo** (variable, `wdth` axis) carries the system — set wide (`wdth 125`) for titles via the
+  `display` / `credit` utilities, normal width for text and the small `meta` labels.
+- **Newsreader** italic (`serif` utility) is reserved for a few spoken statements.
+- Sizes come from one scale in `globals.css` (`text-hero`, `text-h2`, `text-h3`, `text-statement`,
+  `text-quote`, `text-lead`, `text-body`, `text-meta`); spacing from `--edge`, `--section-y`, `--header-gap`.
+
 ### Video tips
-Hero loop: H.264 MP4, 1920×1080 (or 2560×1080), 8–15 s, no audio track, ~4–8 MB, seamless first/last frame.
-The hero video only loads on ≥768 px screens without reduced-motion or Save-Data.
+Showreel: H.264 MP4 at `public/videos/showreel.mp4` (1920×1080, ~20–40 MB), or a Vimeo/YouTube embed URL in
+`siteConfig.media.showreelEmbed` — an embed is lighter to host.
 
 ## Structure
 
@@ -56,12 +68,14 @@ The hero video only loads on ≥768 px screens without reduced-motion or Save-Da
 src/app/            layout (fonts, metadata, JSON-LD), page, work/[slug], template (route curtain),
                     sitemap.ts, robots.ts, icon.svg, apple-icon.png, not-found
 src/components/
-  layout/           Navbar, Footer, Preloader, JsonLd
-  sections/         Hero, SelectedWork, Showreel, Photography, About, Services, Contact
-  portfolio/        ProjectCard, ProjectIndex, ProjectDetail, Gallery, Lightbox, VideoModal
-  animations/       SmoothScroll (Lenis+GSAP), CustomCursor, TextReveal, Reveal, Parallax,
-                    MagneticButton, ScrollMarquee
-src/lib/            intro store, reveal hook, client/media-query hooks
+  layout/           Navbar (sticky), Footer (wordmark), Preloader (title card), JsonLd
+  sections/         Hero (letterbox title sequence), SelectedWork, Showreel, Photography,
+                    About, Services, Contact
+  portfolio/        WorkReel (pinned horizontal reel), ProjectIndex, ProjectDetail, Gallery,
+                    Lightbox, VideoModal
+  animations/       SmoothScroll (Lenis+GSAP), CustomCursor, TextReveal, Reveal, Parallax
+  ui/               Img (next/image + Unsplash CDN loader), SectionHeader, BackToTop, CurrentYear
+src/lib/            unsplash URL helper, intro store, reveal hook, client/media-query hooks
 ```
 
 Motion respects `prefers-reduced-motion` (Lenis, parallax, cursor, hero video, preloader and reveals are disabled or instant).
