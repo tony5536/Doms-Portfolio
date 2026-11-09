@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/* ───────────────────────── Design tokens ───────────────────────── */
+@theme {
+  --color-ink: #080808;
+  --color-ink-2: #111111;
+  --color-ink-3: #1a1a1a;
+  --color-bone: #f5f3ef;
+  --color-ash: #929292;
+  --color-smoke: #5c5c5c;
+  --color-champagne: #c8b89a;
+  --color-silver: #bdb7ad;
+  --color-line: rgb(245 243 239 / 0.12);
+
+  --font-sans: var(--font-inter-tight), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --ease-cinema: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --breakpoint-3xl: 112rem;
+
+  /* Type scale — every section uses these, nothing ad hoc */
+  --text-hero: clamp(4.2rem, 17vw, 17rem);
+  --text-hero--line-height: 0.84;
+  --text-h2: clamp(3rem, 9vw, 9.5rem);
+  --text-h2--line-height: 0.86;
+  --text-h3: clamp(2rem, 4.2vw, 4.5rem);
+  --text-h3--line-height: 0.95;
+  --text-statement: clamp(2.2rem, 4.6vw, 4.75rem);
+  --text-statement--line-height: 1.02;
+  --text-quote: clamp(1.6rem, 3vw, 2.6rem);
+  --text-quote--line-height: 1.15;
+  --text-lead: clamp(1.25rem, 1.9vw, 1.75rem);
+  --text-lead--line-height: 1.3;
+  --text-body: clamp(1rem, 1.1vw, 1.125rem);
+  --text-body--line-height: 1.7;
+}
+
+/* ───────────────────────── Base ───────────────────────── */
+:root {
+  color-scheme: dark;
+  /* Horizontal: gutter between columns, and the page edge that keeps
+     content inside one max width on large screens. */
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --max-w: 1600px;
+  --edge: max(var(--gutter), calc((100vw - var(--max-w)) / 2));
+  /* Vertical rhythm shared by every section */
+  --section-y: clamp(6rem, 11vw, 11rem);
+  --header-gap: clamp(3.5rem, 7vw, 6.5rem);
+  --block-gap: clamp(4rem, 9vw, 9rem);
+}
+
+html {
+  background: var(--color-ink);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-champagne);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-champagne);
+  outline-offset: 4px;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Returning visitors / reduced motion skip the opening slate (set pre-hydration) */
+html.intro-seen #dx-preloader {
+  display: none;
+}
+
+/* Custom cursor — only hides the native cursor when the custom one is active */
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+}
+
+/* ───────────────────────── Utilities ───────────────────────── */
+/* Page edge: gutter on small screens, centred max-width on large ones */
+@utility px-gutter {
+  padding-inline: var(--edge);
+}
+
+@utility section-y {
+  padding-block: var(--section-y);
+}
+
+@utility mb-header {
+  margin-bottom: var(--header-gap);
+}
+
+@utility mt-header {
+  margin-top: var(--header-gap);
+}
+
+@utility mt-block {
+  margin-top: var(--block-gap);
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ash);
+}
+
+@utility display {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: -0.045em;
+  line-height: 0.84;
+}
+
+@utility serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+@utility hairline {
+  border-color: var(--color-line);
+}
+
+@utility link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.6s var(--ease-out-expo);
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 1px;
+    background-position: 0% 100%;
+  }
+}
+
+/* ───────────────────────── Film grain ───────────────────────── */
+.film-grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.9s steps(6) infinite;
+  will-change: transform;
+}
+
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -4%); }
+  60% { transform: translate(-4%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes kenburns {
+  from { transform: scale(1.04) translate3d(0, 0, 0); }
+  to { transform: scale(1.14) translate3d(-1.5%, -1%, 0); }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scroll-cue {
+  0% { transform: translateY(-100%); }
+  60%, 100% { transform: translateY(220%); }
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.15; }
+}
+
+.animate-kenburns { animation: kenburns 24s ease-in-out infinite alternate; }
+.animate-spin-slow { animation: spin-slow 18s linear infinite; }
+.animate-scroll-cue { animation: scroll-cue 2.4s var(--ease-cinema) infinite; }
+.animate-blink { animation: blink 1.6s steps(1) infinite; }
+
+/* ───────────────────────── Reduced motion ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .film-grain { animation: none; }
+}
