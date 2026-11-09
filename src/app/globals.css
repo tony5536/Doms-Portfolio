@@ -20,12 +20,17 @@
   --ease-cinema: cubic-bezier(0.76, 0, 0.24, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Type scale — every section uses these, nothing ad hoc */
-  --text-hero: clamp(2.5rem, 8.6vw, 9.75rem);
+  /* Type scale — every section uses these, nothing ad hoc.
+     Display sizes are derived from measured Archivo-wide word widths so the
+     longest single word always fits the content column, 320px phones up:
+       hero  — "MONOCHROME" 9.5em; "DOMINIC XAVIER" one line ≥640px (10.4em)
+       h2    — "REMEMBERING." 9.6em
+       h3    — "CINEMATOGRAPHY" 11.6em in the services column */
+  --text-hero: clamp(1.7rem, 8.5vw, 9.75rem);
   --text-hero--line-height: 0.92;
-  --text-h2: clamp(2.5rem, 7vw, 7.5rem);
+  --text-h2: clamp(1.75rem, 0.5rem + 6.3vw, 7.5rem);
   --text-h2--line-height: 0.92;
-  --text-h3: clamp(1.6rem, 2.9vw, 3rem);
+  --text-h3: clamp(1.15rem, 0.3rem + 4.5vw, 3rem);
   --text-h3--line-height: 1;
   --text-statement: clamp(2.4rem, 5.4vw, 5.75rem);
   --text-statement--line-height: 1.02;

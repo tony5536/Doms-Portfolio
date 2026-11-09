@@ -21,13 +21,13 @@ export default function About() {
           stagger={0.035}
         />
 
-        <div className="mt-header grid gap-14 md:grid-cols-12 md:gap-[var(--gutter)]">
+        <div className="mt-header grid gap-14 lg:grid-cols-12 lg:gap-[var(--gutter)]">
           {/* Portrait */}
-          <div className="md:col-span-5">
-            <div className="md:sticky md:top-24">
+          <div className="min-w-0 md:max-w-[26rem] lg:col-span-5 lg:max-w-none">
+            <div className="lg:sticky lg:top-24">
               <Reveal variant="clip">
                 <Parallax className="aspect-[635/845] bg-ink-3" amount={10}>
-                  <Image src={media.portrait.src} alt={media.portrait.alt} fill sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
+                  <Image src={media.portrait.src} alt={media.portrait.alt} fill sizes="(min-width: 1024px) 40vw, (min-width: 768px) 26rem, 100vw" className="object-cover" />
                 </Parallax>
               </Reveal>
               <p className="meta mt-4">{siteConfig.name}, {siteConfig.location.city}</p>
@@ -35,7 +35,7 @@ export default function About() {
           </div>
 
           {/* Text */}
-          <div className="md:col-span-6 md:col-start-7">
+          <div className="min-w-0 lg:col-span-6 lg:col-start-7">
             <Reveal>
               <p className="display text-h3">{siteConfig.name}</p>
               <p className="meta mt-3">{siteConfig.role}</p>
@@ -67,11 +67,12 @@ export default function About() {
 
             <Reveal className="mt-14">
               <h3 className="meta mb-5">Expertise</h3>
+              {/* Separators carry real spaces so the line can wrap between items */}
               <p className="text-lead text-bone/85">
                 {about.expertise.map((x, i) => (
                   <span key={x}>
-                    {x}
-                    {i < about.expertise.length - 1 && <span className="px-2 text-smoke">/</span>}
+                    <span className="whitespace-nowrap">{x}</span>
+                    {i < about.expertise.length - 1 && <span className="text-smoke"> / </span>}
                   </span>
                 ))}
               </p>

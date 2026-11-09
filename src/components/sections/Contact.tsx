@@ -80,7 +80,7 @@ export default function Contact() {
           </Reveal>
           <Reveal delay={0.1} className="md:col-span-5 md:col-start-8 md:text-right">
             {email ? (
-              <a href={`mailto:${email}`} className="display link-line text-[clamp(1.25rem,2.4vw,2.25rem)]">
+              <a href={`mailto:${email}`} className="display link-line break-all text-[clamp(1.1rem,2.4vw,2.25rem)]">
                 {email}
               </a>
             ) : (
@@ -96,9 +96,9 @@ export default function Contact() {
           </Reveal>
         </div>
 
-        <div className="mt-block grid gap-16 md:grid-cols-12 md:gap-[var(--gutter)]">
+        <div className="mt-block grid gap-16 lg:grid-cols-12 lg:gap-[var(--gutter)]">
           {/* Channels */}
-          <div className="md:col-span-4">
+          <div className="lg:col-span-4">
             <h3 className="meta mb-6">Elsewhere</h3>
             <ul>
               {channels.map((c) =>
@@ -123,7 +123,7 @@ export default function Contact() {
           </div>
 
           {/* Inquiry form */}
-          <form id="inquiry" onSubmit={onSubmit} className="md:col-span-7 md:col-start-6">
+          <form id="inquiry" onSubmit={onSubmit} className="lg:col-span-7 lg:col-start-6">
             <h3 className="meta mb-6">Project inquiry</h3>
             <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
               <div className="relative">

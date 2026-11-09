@@ -13,8 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
 const frameRatio = (w: number, h: number) => Math.min(1.85, Math.max(0.72, w / h));
 
 /**
- * Desktop: the section pins and the projects travel sideways like frames
- * on a strip, scrubbed by scroll. Mobile / reduced motion: a vertical list.
+ * Desktop (≥1024px): the section pins and the projects travel sideways like frames
+ * on a strip, scrubbed by scroll. Tablet: a two-column grid. Phone / reduced motion: a vertical list.
  */
 export default function WorkReel({ projects }: { projects: Project[] }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -24,7 +24,7 @@ export default function WorkReel({ projects }: { projects: Project[] }) {
 
   useEffect(() => {
     const mm = gsap.matchMedia();
-    mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
+    mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
       const el = track.current!;
       const distance = () => Math.max(0, el.scrollWidth - window.innerWidth);
       const tween = gsap.to(el, {
@@ -59,23 +59,24 @@ export default function WorkReel({ projects }: { projects: Project[] }) {
   }, [projects.length]);
 
   return (
-    <div ref={wrap} className="relative md:flex md:h-[100svh] md:flex-col md:justify-center md:overflow-hidden">
+    <div ref={wrap} className="relative lg:flex lg:h-[100svh] lg:flex-col lg:justify-center lg:overflow-hidden">
       <div
         ref={track}
-        className="flex flex-col gap-20 px-gutter md:w-max md:flex-row md:items-end md:gap-[5vw] md:pr-[12vw] md:will-change-transform"
+        data-reel-track
+        className="flex flex-col gap-20 px-gutter md:grid md:grid-cols-2 md:gap-x-[var(--gutter)] md:gap-y-20 lg:flex lg:w-max lg:flex-row lg:items-end lg:gap-[5vw] lg:pr-[12vw] lg:will-change-transform"
       >
         {projects.map((p, i) => (
-          <article key={p.slug} className="group md:shrink-0">
+          <article key={p.slug} className="group min-w-0 lg:shrink-0">
             <Link href={`/work/${p.slug}`} data-cursor="View" className="block" aria-label={`${p.title} — ${p.category}, ${p.year}`}>
               <div
-                className="relative w-full overflow-hidden bg-ink-3 md:h-[58svh] md:w-auto"
+                className="relative w-full overflow-hidden bg-ink-3 lg:h-[58svh] lg:w-auto"
                 style={{ aspectRatio: frameRatio(p.cover.width, p.cover.height) }}
               >
                 <Image
                   src={p.cover.src}
                   alt={p.cover.alt}
                   fill
-                  sizes="(min-width: 768px) 60vw, 100vw"
+                  sizes="(min-width: 1024px) 60vw, (min-width: 768px) 50vw, 100vw"
                   // Native lazy-loading doesn't see frames inside a transformed, pinned track.
                   loading="eager"
                   className="object-cover transition-transform duration-[1.6s] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
@@ -99,7 +100,7 @@ export default function WorkReel({ projects }: { projects: Project[] }) {
       </div>
 
       {/* progress (desktop) */}
-      <div className="mt-10 hidden items-center gap-6 px-gutter md:flex">
+      <div className="mt-10 hidden items-center gap-6 px-gutter lg:flex">
         <span className="meta tabular-nums !text-bone">
           <span ref={counter}>01</span>
           <span className="text-ash"> / {String(projects.length).padStart(2, "0")}</span>

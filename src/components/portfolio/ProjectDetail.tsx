@@ -109,7 +109,7 @@ export default function ProjectDetail({ project, next }: { project: Project; nex
         </Reveal>
         <div className="md:col-span-7 md:col-start-6">
           <TextReveal as="p" text={project.summary} className="serif text-statement" stagger={0.03} />
-          <div className="mt-12 grid gap-6 md:grid-cols-2 md:gap-10">
+          <div className="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-10">
             {project.description.map((p, i) => (
               <Reveal key={i} delay={i * 0.08}>
                 <p className="text-body text-bone/75">{p}</p>
